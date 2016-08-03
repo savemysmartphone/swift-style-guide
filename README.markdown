@@ -1,10 +1,8 @@
-# The Official raywenderlich.com Swift Style Guide.
+# The Official Save Swift Style Guide (:heart: Forked from raywenderlich.com :heart:).
 
 This style guide is different from others you may see, because the focus is centered on readability for print and the web. We created this style guide to keep the code in our books, tutorials, and starter kits nice and consistent — even though we have many different authors working on the books.
 
 Our overarching goals are conciseness, readability, and simplicity.
-
-Writing Objective-C? Check out our [Objective-C Style Guide](https://github.com/raywenderlich/objective-c-style-guide) too.
 
 ## Table of Contents
 
@@ -39,6 +37,7 @@ Writing Objective-C? Check out our [Objective-C Style Guide](https://github.com/
   * [Type Inference](#type-inference)
   * [Syntactic Sugar](#syntactic-sugar)
 * [Functions vs Methods](#functions-vs-methods)
+  * [Declaration](#declaration)
 * [Memory Management](#memory-management)
   * [Extending Lifetime](#extending-lifetime)
 * [Access Control](#access-control)
@@ -284,29 +283,73 @@ Keep imports minimal. For example, don't import `UIKit` when importing `Foundati
 * Indent using 2 spaces rather than tabs to conserve space and help prevent line wrapping. Be sure to set this preference in Xcode and in the Project settings as shown below:
 
   ![Xcode indent settings](screens/indentation.png)
-  
+
   ![Xcode Project settings](screens/project_settings.png)
 
-* Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
-* Tip: You can re-indent by selecting some code (or ⌘A to select all) and then Control-I (or Editor\Structure\Re-Indent in the menu). Some of the Xcode template code will have 4-space tabs hard coded, so this is a good way to fix that.
+* Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the line after the statement.
 
 **Preferred:**
 ```swift
-if user.isHappy {
-  // Do something
-} else {
-  // Do something else
+if
+  let a = cond(),
+  let b = cond2(),
+  let b = cond3()
+  where 1 == 1
+{
+  // ...
+}
+else
+{
+
 }
 ```
 
 **Not Preferred:**
 ```swift
-if user.isHappy
-{
-  // Do something
+if let a = cond(), let b = cond2(), let b = cond3() where 1 == 1{
+  // ...
+} else {
+  // ...
 }
-else {
-  // Do something else
+```
+
+**Preferred:**
+```swift
+guard
+  let a = cond(),
+  let b = cond2(),
+  let c = cond3()
+  else
+  {
+    return
+  }
+```
+
+**Not Preferred:**
+```swift
+guard let a = cond(), let b = cond2(), let c = cond3() else {
+  return
+}
+```
+
+**Preferred:**
+```swift
+switch value {
+case "foo":
+  foo()
+case "bar":
+  bar()
+default:
+  ()
+}
+```
+
+**Not Preferred:**
+```swift
+switch value {
+case "foo": foo()
+case "barWithSomethingElse": bar()
+default: ()
 }
 ```
 
@@ -407,7 +450,7 @@ class BoardLocation {
   init(row: Int, column: Int) {
     self.row = row
     self.column = column
-    
+
     let closure = {
       print(self.row)
     }
@@ -442,7 +485,7 @@ Mark classes `final` when inheritance is not intended. Example:
 ```swift
 // Turn any generic type into a reference type using this Box class.
 final class Box<T> {
-  let value: T 
+  let value: T
   init(_ value: T) {
     self.value = value
   }
@@ -459,11 +502,15 @@ func reticulateSplines(spline: [Double]) -> Bool {
 }
 ```
 
-For functions with long signatures, add line breaks at appropriate points and add an extra indent on subsequent lines:
+For functions with long signatures, add line breaks at each parameters and add start the braces at the line after:
 
 ```swift
-func reticulateSplines(spline: [Double], adjustmentFactor: Double,
-    translateConstant: Int, comment: String) -> Bool {
+func reticulateSplines(
+    spline: [Double],
+    adjustmentFactor: Double,
+    translateConstant: Int,
+    comment: String) -> Bool
+{
   // reticulate code goes here
 }
 ```
@@ -507,6 +554,14 @@ For single-expression closures where the context is clear, use implicit returns:
 ```swift
 attendeeList.sort { a, b in
   a > b
+}
+```
+
+or
+
+```swift
+attendeeList.sort {
+  $0 > $1
 }
 ```
 
@@ -738,6 +793,64 @@ let tuples = zip(a, b)  // feels natural as a free function (symmetry)
 let value = max(x,y,z)  // another free function that feels natural
 ```
 
+### Declarations
+
+**Preferred**
+```swift
+func f(a: Int, b: Int) -> Int {
+  return a + b
+}
+```
+
+**Tip:**: When method/function parameters name are obvious / Meaningless, we skip parameters naming
+
+**Not Preferred:**
+```swift
+func sum(a: Int, b: Int) -> Int {
+  return a + b
+}
+
+sum(1, b: 2)
+```
+
+**Preferred**
+```swift
+func sum(a: Int, _ b: Int) -> Int {
+  return a + b
+}
+
+sum(1, 2)
+```
+
+**Tip:**: At the opposite, when parameter names need to be meaningful
+
+**Not Preferred:**
+```swift
+func shoot(target: X, _ weapon: Y) -> Bool {
+  return true
+}
+
+shoot(target, shotgun)
+```
+
+**Preferred**
+```swift
+func shoot(target: X, weapon: Y) -> Bool {
+  return true
+}
+
+shoot(target, weapon: shotgun)
+```
+
+**Preferred (verbose)**
+```swift
+func shoot(target: X, withWeapon weapon: Y) -> Bool {
+  return true
+}
+
+shoot(target, withWeapon: shotgun)
+```
+
 ## Memory Management
 
 Code (even non-production, tutorial demo code) should not create reference cycles. Analyze your object graph and prevent strong cycles with `weak` and `unowned` references. Alternatively, use value types (`struct`, `enum`) to prevent cycles altogether.
@@ -840,9 +953,9 @@ func computeFFT(context: Context?, inputData: InputData?) throws -> Frequencies 
 
   guard let context = context else { throw FFTError.noContext }
   guard let inputData = inputData else { throw FFTError.noInputData }
-    
+
   // use context and input to compute the frequencies
-    
+
   return frequencies
 }
 ```
@@ -981,7 +1094,7 @@ Smiley faces are a very prominent style feature of the raywenderlich.com site! I
 ## Credits
 
 [Ray Fix](https://github.com/rayfix) currently maintains this style guide.
-It is a collaborative effort from the most stylish raywenderlich.com team members and its community: 
+It is a collaborative effort from the most stylish raywenderlich.com team members and its community:
 
 * [Jawwad Ahmad](https://github.com/jawwad)
 * [Soheil Moayedi Azarpour](https://github.com/moayes)
