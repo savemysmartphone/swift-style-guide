@@ -22,7 +22,6 @@ Our overarching goals are conciseness, readability, and simplicity.
 * [Spacing](#spacing)
 * [Comments](#comments)
 * [Classes and Structures](#classes-and-structures)
-  * [Use of Self](#use-of-self)
   * [Protocol Conformance](#protocol-conformance)
   * [Computed Properties](#computed-properties)
   * [Final](#final)
@@ -288,12 +287,41 @@ Keep imports minimal. For example, don't import `UIKit` when importing `Foundati
 
 * Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the line after the statement.
 
+**Single binding if/else**
+
+**Preferred:**
+```swift
+if let a = 1
+{
+  // ...
+}
+else
+{
+
+}
+```
+
+**Not Preferred:**
+```swift
+if
+  let a = cond()
+{
+  // ...
+}
+else
+{
+  // ...
+}
+```
+
+**Multi binding if/else/guard**
+
 **Preferred:**
 ```swift
 if
   let a = cond(),
   let b = cond2(),
-  let b = cond3()
+  let c = someOtherLongFunctionCall(foo, andAnotherOne: bar)
   where 1 == 1
 {
   // ...
@@ -306,9 +334,12 @@ else
 
 **Not Preferred:**
 ```swift
-if let a = cond(), let b = cond2(), let b = cond3() where 1 == 1{
+if let a = cond(), let b = cond2(), let c = someOtherLongFunctionCall(foo, andAnotherOne: bar) where 1 == 1
+{
   // ...
-} else {
+}
+else
+{
   // ...
 }
 ```
@@ -318,16 +349,28 @@ if let a = cond(), let b = cond2(), let b = cond3() where 1 == 1{
 guard
   let a = cond(),
   let b = cond2(),
-  let c = cond3()
+  let c = someOtherLongFunctionCall(foo, andAnotherOne: bar)
+  where 1 == 1
   else
   {
     return
   }
 ```
 
+Also good:
+
+```swift
+guard
+  let a = cond(),
+  let b = cond2(),
+  let c = someOtherLongFunctionCall(foo, andAnotherOne: bar)
+  where 1 == 1
+  else { return }
+```
+
 **Not Preferred:**
 ```swift
-guard let a = cond(), let b = cond2(), let c = cond3() else {
+guard let a = cond(), let b = cond2(), let c = someOtherLongFunctionCall(foo, andAnotherOne: bar) else {
   return
 }
 ```
@@ -337,7 +380,7 @@ guard let a = cond(), let b = cond2(), let c = cond3() else {
 switch value {
 case "foo":
   foo()
-case "bar":
+case "barWithSomethingElse":
   bar()
 default:
   ()
@@ -435,28 +478,6 @@ The example above demonstrates the following style guidelines:
  + Define multiple variables and structures on a single line if they share a common purpose / context.
  + Indent getter and setter definitions and property observers.
  + Don't add modifiers such as `internal` when they're already the default. Similarly, don't repeat the access modifier when overriding a method.
-
-
-### Use of Self
-
-For conciseness, avoid using `self` since Swift does not require it to access an object's properties or invoke its methods.
-
-Use `self` when required to differentiate between property names and arguments in initializers, and when referencing properties in closure expressions (as required by the compiler):
-
-```swift
-class BoardLocation {
-  let row: Int, column: Int
-
-  init(row: Int, column: Int) {
-    self.row = row
-    self.column = column
-
-    let closure = {
-      print(self.row)
-    }
-  }
-}
-```
 
 ### Computed Properties
 
